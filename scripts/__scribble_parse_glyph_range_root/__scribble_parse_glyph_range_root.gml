@@ -6,7 +6,6 @@ function __scribble_parse_glyph_range_root(_value, _font_name = undefined, _sort
 {
     var _output_dict  = {};
     var _output_array = [];
-    
     if (is_string(_value))
     {
         if (_value == "all")

@@ -1,5 +1,5 @@
 #macro __font_add__ font_add
-#macro font_add __scribble_font_add_from_file
+//#macro font_add __scribble_font_add_from_file
 
 function __scribble_font_add_from_file(_name, _size, _bold, _italic, _first, _last) 
 {

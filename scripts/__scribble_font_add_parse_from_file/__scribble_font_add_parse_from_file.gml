@@ -1,10 +1,10 @@
-function __scribble_font_add_parse_from_file(_file_name, _font, _font_glyph_array)
+function __scribble_font_add_parse_from_file(_name, _font, _sdf)
 {
     
     //We set this font as active so string_height will return the height of this font's glyphs.
     var _old_font = draw_get_font();
     draw_set_font(_font);
-    var _name = font_get_name(_font);
+    var _font_name = font_get_name(_font);
     
     static _font_data_map = __scribble_get_font_data_map();
     if (ds_map_exists(_font_data_map, _name))
@@ -13,13 +13,13 @@ function __scribble_font_add_parse_from_file(_file_name, _font, _font_glyph_arra
         _font_data_map[? _name].__destroy();
     }
     
-    if (SCRIBBLE_VERBOSE) __scribble_trace("Adding \"", _file_name, "\" as standard font");
+    if (SCRIBBLE_VERBOSE) __scribble_trace("Adding \"", _name, "\" as standard font");
     
     var _scribble_state = __scribble_get_state();
     if (_scribble_state.__default_font == undefined)
     {
-        if (SCRIBBLE_VERBOSE) __scribble_trace("Setting default font to \"" + string(_file_name) + "\"");
-        _scribble_state.__default_font = _file_name;
+        if (SCRIBBLE_VERBOSE) __scribble_trace("Setting default font to \"" + string(_name) + "\"");
+        _scribble_state.__default_font = _name;
     }
     
     try
@@ -30,6 +30,7 @@ function __scribble_font_add_parse_from_file(_file_name, _font, _font_glyph_arra
         var _font_info = font_get_info(_font);
         var _info_glyphs_dict = _font_info.glyphs;
         
+        var _font_glyph_array = variable_struct_get_names(_info_glyphs_dict);
         var _size = array_length(_font_glyph_array);
         
         var _info_glyphs_array = array_create(array_length(_font_glyph_array));
@@ -42,9 +43,9 @@ function __scribble_font_add_parse_from_file(_file_name, _font, _font_glyph_arra
             ++_i;
         }
         
-        if (SCRIBBLE_VERBOSE) __scribble_trace("Processing font \"" + _file_name + "\"");
+        if (SCRIBBLE_VERBOSE) __scribble_trace("Processing font \"" + _name + "\"");
         
-        var _asset       = asset_get_index(_name);
+        var _asset       = asset_get_index(_font_name);
         var _texture     = font_get_texture(_asset);
         var _texture_uvs = font_get_uvs(_asset);
         
@@ -57,7 +58,7 @@ function __scribble_font_add_parse_from_file(_file_name, _font, _font_glyph_arra
         
         if (SCRIBBLE_VERBOSE)
         {
-            __scribble_trace("  \"" + _file_name +"\""
+            __scribble_trace("  \"" + _name +"\""
                              + ", asset = " + string(_asset)
                              + ", texture = " + string(_texture)
                              + ", top-left = " + string(_texture_l) + "," + string(_texture_t)
@@ -67,7 +68,7 @@ function __scribble_font_add_parse_from_file(_file_name, _font, _font_glyph_arra
                              + " -> " + string_format(_texture_uvs[2], 1, 10) + "," + string_format(_texture_uvs[3], 1, 10));
         }
         
-        var _font_data = new __scribble_class_font(_name, _size, false);
+        var _font_data = new __scribble_class_font(_name, _size, _sdf);
         var _font_glyphs_map      = _font_data.__glyphs_map;
         var _font_glyph_data_grid = _font_data.__glyph_data_grid;
         var _font_kerning_map     = _font_data.__kerning_map;
@@ -180,7 +181,7 @@ function __scribble_font_add_parse_from_file(_file_name, _font, _font_glyph_arra
         var _space_index = _font_glyphs_map[? 32];
         if (_space_index == undefined)
         {
-            __scribble_trace("Warning! Space character not found in character set for font added via font_add() \"", _file_name, "\"");
+            __scribble_trace("Warning! Space character not found in character set for font added via font_add() \"", _name, "\"");
         
             var _i = _size;
             ds_grid_resize(_font_glyph_data_grid, _i+1, SCRIBBLE_GLYPH.__SIZE);
@@ -223,6 +224,6 @@ function __scribble_font_add_parse_from_file(_file_name, _font, _font_glyph_arra
     catch(_error)
     {
         __scribble_trace(_error);
-        __scribble_error("There was an error whilst reading \"", _file_name, "\"\nPlease ensure that the font file exists before using font_add()\nIf this issue persists, please report it");
+        __scribble_error("There was an error whilst reading \"", _name, "\"\nPlease ensure that the font file exists before using scribble_font_add()\nIf this issue persists, please report it");
     }
 }

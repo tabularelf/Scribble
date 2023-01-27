@@ -17,6 +17,8 @@ function __scribble_tick()
     static _gc_vbuff_refs = _cache_state.__gc_vbuff_refs;
     static _gc_vbuff_ids  = _cache_state.__gc_vbuff_ids;
     
+    static _tp_list = __scribble_get_texture_page_list();
+    
     _scribble_state.__frames++;
     var _frames = _scribble_state.__frames;
     
@@ -36,6 +38,17 @@ function __scribble_tick()
         }
     }
     
+    #region Reload texture pages (and free up dead ones)
+    var _i = 0;
+    repeat(ds_list_size(_tp_list)) {
+        // Validate() returns true or false for the texture page being alive, while also checking on surfaces + buffers.
+        if (!_tp_list[| _i].Validate()) {
+            ds_list_delete(_tp_list, _i);
+            --_i;
+        }
+        ++_i;
+    }
+    #endregion
     
     
     #region Scan through the cache to see if any text elements have elapsed
